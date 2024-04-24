@@ -10,10 +10,10 @@ public class ControladorRango {
 		this.rango = rango;
 	}
 
-	public void actualizarRango() {
-
-
-	}
+	public void actualizarRango(int nuevoRango) {
+        rango.setRango(nuevoRango);
+        System.out.println("El rango se ha actualizado a: " + nuevoRango);
+    }
 
 	public Rango getRango() {
 		return rango;
