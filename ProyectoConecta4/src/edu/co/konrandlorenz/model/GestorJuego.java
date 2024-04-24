@@ -41,6 +41,7 @@ public class GestorJuego implements Juego {
             while (!haTerminado()) {
                 // Turno del jugador actual
                 System.out.println("Turno de " + jugadorActual.getNombre() + ":");
+
                 if (jugadorActual instanceof JugadorHumano) {
                     System.out.print("Ingresa la columna donde deseas colocar la ficha (1-7): ");
                     int columna = scanner.nextInt() - 1;

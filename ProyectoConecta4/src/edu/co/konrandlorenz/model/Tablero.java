@@ -42,16 +42,15 @@ public class Tablero {
 
     
     
-    public boolean colocarFicha(int columna, int j) {
+    public boolean colocarFicha(int columna, char ficha) {
         for (int i = filas - 1; i >= 0; i--) {
             if (cuadricula[i][columna] == VACIO) {
-                cuadricula[i][columna] = (char) j;
+                cuadricula[i][columna] = ficha;
                 return true;
             }
         }
         return false; // Columna llena
     }
-    
     
     public boolean hayGanador(int k) {
         int[][] direcciones = {
