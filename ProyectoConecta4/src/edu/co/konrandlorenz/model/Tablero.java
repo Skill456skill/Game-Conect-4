@@ -4,83 +4,91 @@ import java.util.Arrays;
 
 public class Tablero {
 	private int filas;
-	private int columnas;
-	private int[][] cuadricula;
-    private static final int VACIO = 0;
-    private static final int JUGADOR1 = 1;
-    private static final int JUGADOR2 = 2;
+    private int columnas;
+    private char[][] cuadricula;
+    private static final char VACIO = ' ';
 
-    public Tablero(int filas, int columnas, int cuadricula) {
+
+    public Tablero(int filas, int columnas) {
         this.filas = filas;
         this.columnas = columnas;
-        this.cuadricula = new int[filas][columnas];
-        for (int i = 0; i < filas; i++) {
-            for (int j = 0; j < columnas; j++) {
-                this.cuadricula[i][j] = VACIO;
-            }
-        }
+        this.cuadricula = new char[filas][columnas];
+        inicializarTablero();
     }
 
-    public boolean colocarFicha(int columna, int jugador) {
+    public void inicializarTablero() {
+        for (int i = 0; i < filas; i++) {
+            Arrays.fill(cuadricula[i], VACIO);
+        }
+    }
+    
+    public void imprimirMatrizConFichas(char fichaJugador1, char fichaJugador2) {
+        System.out.println("Tablero inicial con fichas de los jugadores:");
+        for (int i = 0; i < filas; i++) {
+            for (int j = 0; j < columnas; j++) {
+                char ficha = cuadricula[i][j];
+                if (ficha == VACIO) {
+                    System.out.print(VACIO + " ");
+                } else if (ficha == fichaJugador1) {
+                    System.out.print("X "); // Representación de la ficha del jugador 1
+                } else if (ficha == fichaJugador2) {
+                    System.out.print("O "); // Representación de la ficha del jugador 2
+                }
+            }
+            System.out.println();
+        }
+        System.out.println();
+    }
+
+    
+    
+    public boolean colocarFicha(int columna, int j) {
         for (int i = filas - 1; i >= 0; i--) {
             if (cuadricula[i][columna] == VACIO) {
-                cuadricula[i][columna] = jugador;
+                cuadricula[i][columna] = (char) j;
                 return true;
             }
         }
-        return false; 
+        return false; // Columna llena
     }
-    public boolean hayGanador() {
-        // Verificar horizontalmente
+    
+    
+    public boolean hayGanador(int k) {
+        int[][] direcciones = {
+                {0, 1},  // Horizontal
+                {1, 0},  // Vertical
+                {1, 1},  // Diagonal principal
+                {1, -1}  // Diagonal inversa
+        };
+
         for (int i = 0; i < filas; i++) {
-            for (int j = 0; j < columnas - 3; j++) {
-                if (cuadricula[i][j] != VACIO &&
-                    cuadricula[i][j] == cuadricula[i][j + 1] &&
-                    cuadricula[i][j] == cuadricula[i][j + 2] &&
-                    cuadricula[i][j] == cuadricula[i][j + 3]) {
-                    return true;
-                }
-            }
-        }
-
-        // Verificar verticalmente
-        for (int i = 0; i < filas - 3; i++) {
             for (int j = 0; j < columnas; j++) {
-                if (cuadricula[i][j] != VACIO &&
-                    cuadricula[i][j] == cuadricula[i + 1][j] &&
-                    cuadricula[i][j] == cuadricula[i + 2][j] &&
-                    cuadricula[i][j] == cuadricula[i + 3][j]) {
-                    return true;
+                for (int[] dir : direcciones) {
+                    if (verificarDireccion(k, i, j, dir[0], dir[1])) {
+                        return true; // El jugador ha ganado
+                    }
                 }
             }
         }
-
-        // Verificar diagonalmente (de izquierda a derecha)
-        for (int i = 0; i < filas - 3; i++) {
-            for (int j = 0; j < columnas - 3; j++) {
-                if (cuadricula[i][j] != VACIO &&
-                    cuadricula[i][j] == cuadricula[i + 1][j + 1] &&
-                    cuadricula[i][j] == cuadricula[i + 2][j + 2] &&
-                    cuadricula[i][j] == cuadricula[i + 3][j + 3]) {
-                    return true;
-                }
-            }
-        }
-
-        // Verificar diagonalmente (de derecha a izquierda)
-        for (int i = 0; i < filas - 3; i++) {
-            for (int j = 3; j < columnas; j++) {
-                if (cuadricula[i][j] != VACIO &&
-                    cuadricula[i][j] == cuadricula[i + 1][j - 1] &&
-                    cuadricula[i][j] == cuadricula[i + 2][j - 2] &&
-                    cuadricula[i][j] == cuadricula[i + 3][j - 3]) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
+        return false; // El jugador no ha ganado
     }
+    
+    private boolean verificarDireccion(int k, int fil, int col, int filDir, int colDir) {
+        int count = 0;
+
+        for (int i = fil, j = col; i >= 0 && i < filas && j >= 0 && j < columnas; i += filDir, j += colDir) {
+            if (cuadricula[i][j] == k) {
+                count++;
+                if (count == 4) {
+                    return true; // El jugador ha ganado
+                }
+            } else {
+                break;
+            }
+        }
+        return false; // No se encontró una secuencia ganadora en esta dirección
+    }
+
     
     public boolean estaLleno() {
         for (int i = 0; i < filas; i++) {
@@ -92,6 +100,22 @@ public class Tablero {
         }
         return true;
     }
+    
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < filas; i++) {
+            for (int j = 0; j < columnas; j++) {
+                sb.append(cuadricula[i][j]).append(" ");
+            }
+            sb.append("\n");
+        }
+        return sb.toString();
+    }
+    public boolean columnaDisponible(int columna) {
+        return cuadricula[0][columna] == VACIO;
+    }
+
 
     public boolean verificarGanador(int jugador) {
         
@@ -111,14 +135,6 @@ public class Tablero {
 		return VACIO;
 	}
 
-	public static int getJugador1() {
-		return JUGADOR1;
-	}
-
-	public static int getJugador2() {
-		return JUGADOR2;
-	}
-
 	public int getFilas() {
 		return filas;
 	}
@@ -135,19 +151,21 @@ public class Tablero {
 		this.columnas = columnas;
 	}
 
-	public int[][] getCuadricula() {
+
+	public char[][] getCuadricula() {
 		return cuadricula;
 	}
 
-	public void setCuadricula(int[][] cuadricula) {
+	public void setCuadricula(char[][] cuadricula) {
 		this.cuadricula = cuadricula;
 	}
 
-	@Override
-	public String toString() {
-		return "Tablero [filas=" + filas + ", columnas=" + columnas + ", cuadricula=" + Arrays.toString(cuadricula)
-				+ "]";
-	}
+
+
+
+
+
+
 	
 
 }

@@ -6,61 +6,76 @@ public class GestorJuego implements Juego {
 	private Jugador jugadorActual;
     private Jugador jugadorOponente;
     private Tablero tablero;
+    private RankingGlobal rankingGlobal;
     private Scanner scanner;
 
-    public GestorJuego(Jugador jugadorActual, Jugador jugadorOponente, Tablero tablero) {
+
+    public GestorJuego(Jugador jugadorActual, Jugador jugadorOponente, Tablero tablero, RankingGlobal rankingGlobal) {
         this.jugadorActual = jugadorActual;
         this.jugadorOponente = jugadorOponente;
         this.tablero = tablero;
+        this.rankingGlobal = rankingGlobal;
         this.scanner = new Scanner(System.in);
+        this.rankingGlobal = new RankingGlobal(); // Inicializar rankingGlobal aquí
     }
 	
-	public void inicializarJuego() {
-		
-	}
-	
-	public void finalizarJuego() {
-		
-	}
-	
-	public void jugarPartida() {
-		try (Scanner scanner = new Scanner(System.in)) {
-			while (!haTerminado()) {
-	            // Turno del jugador actual
-	            System.out.println("Turno de " + jugadorActual.getNombre() + ":");
-	            if (jugadorActual instanceof JugadorHumano) {
-	                System.out.print("Ingresa la columna donde deseas colocar la ficha (1-7): ");
-	                int columna = scanner.nextInt() - 1;
-	                realizarMovimiento(columna);
-	            } else if (jugadorActual instanceof JugadorComputadora) {
-	                int columna = (int) (Math.random() * tablero.getColumnas());
-	                realizarMovimiento(columna);
-	            }
-	            
-	            // Mostrar estado del tablero
-	            System.out.println("Estado actual del tablero:");
-	            System.out.println(tablero);
+    public void inicializarJuego() {
+        // Inicializar el tablero
+        tablero.inicializarTablero();
 
-	            if (haTerminado()) {
-	                break; // Si el juego ha terminado, salir del bucle
-	            }
-	        }
+        // Barajar el orden de los jugadores
+        if (Math.random() < 0.5) {
+            Jugador temp = jugadorActual;
+            jugadorActual = jugadorOponente;
+            jugadorOponente = temp;
+        }
 
-	        // Mostrar el resultado final
-	        if (getGanador() != null) {
-	            System.out.println("¡El ganador es: " + getGanador().getNombre() + "!");
-	        } else {
-	            System.out.println("¡Empate!");
-	        }
-	    }
-	}
-	
+        System.out.println("¡Juego inicializado!");
+    }
+
+    public void finalizarJuego() {
+        System.out.println("¡Juego finalizado!");
+    }
+    public void jugarPartida() {
+    	try (Scanner scanner = new Scanner(System.in)) {
+            while (!haTerminado()) {
+                // Turno del jugador actual
+                System.out.println("Turno de " + jugadorActual.getNombre() + ":");
+                if (jugadorActual instanceof JugadorHumano) {
+                    System.out.print("Ingresa la columna donde deseas colocar la ficha (1-7): ");
+                    int columna = scanner.nextInt() - 1;
+                    realizarMovimiento(columna);
+                } else if (jugadorActual instanceof JugadorComputadora) {
+                    int columna = ((JugadorComputadora) jugadorActual).realizarMovimiento(tablero, 0); // 0 es solo un valor de ejemplo
+                    realizarMovimiento(columna);
+                }
+
+                // Mostrar estado del tablero
+                System.out.println("Estado actual del tablero:");
+                System.out.println(tablero);
+
+                if (haTerminado()) {
+                    break; // Si el juego ha terminado, salir del bucle
+                }
+            }
+
+            // Mostrar el resultado final solo si hay un ganador válido
+            Jugador ganador = getGanador();
+            if (ganador != null) {
+                System.out.println("¡El ganador es: " + ganador.getNombre() + "!");
+                rankingGlobal.agregarPuntaje(ganador.getNombre(), 1); // Agregar 1 punto al ganador
+                rankingGlobal.mostrarRanking(); // Mostrar el ranking global
+            } else {
+                System.out.println("¡Empate!");
+            }
+        }
+    }
 	public boolean haTerminado() {
-		return tablero.estaLleno() || tablero.hayGanador();
+		return tablero.estaLleno() || tablero.hayGanador(0);
     }
 
     public Jugador getGanador() {
-    	if (tablero.hayGanador()) {
+    	if (tablero.hayGanador(0)) {
             return jugadorActual;
         }
         return null;
@@ -68,22 +83,27 @@ public class GestorJuego implements Juego {
     }
 	
     public void cambiarJugador() {
-        Jugador temp = jugadorActual;
+    	Jugador temp = jugadorActual;
         jugadorActual = jugadorOponente;
         jugadorOponente = temp;
     }
     
     public boolean realizarMovimiento(int columna) {
-        if (tablero.colocarFicha(columna, jugadorActual.getNumero())) {
-            if (tablero.verificarGanador(jugadorActual.getNumero())) {
-                jugadorActual.incrementarPuntaje();
-                return true; // El jugador actual ganó
-            }
+    	tablero.colocarFicha(columna, jugadorActual.getFicha());
+        if (!tablero.verificarGanador(jugadorActual.getFicha())) {
             cambiarJugador();
-            return false; // Movimiento exitoso, el juego continúa
         }
-        return false; // Movimiento inválido, la columna está llena
+		return false;
     }
+    
+
+	public RankingGlobal getRankingGlobal() {
+		return rankingGlobal;
+	}
+
+	public void setRankingGlobal(RankingGlobal rankingGlobal) {
+		this.rankingGlobal = rankingGlobal;
+	}
 
 	public Jugador getJugadorActual() {
 		return jugadorActual;
@@ -121,8 +141,10 @@ public class GestorJuego implements Juego {
 	@Override
 	public String toString() {
 		return "GestorJuego [jugadorActual=" + jugadorActual + ", jugadorOponente=" + jugadorOponente + ", tablero="
-				+ tablero + "]";
+				+ tablero + ", rankingGlobal=" + rankingGlobal + ", scanner=" + scanner + "]";
 	}
+
+
 	
 	
 	

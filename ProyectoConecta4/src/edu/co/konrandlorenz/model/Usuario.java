@@ -1,6 +1,6 @@
 package edu.co.konrandlorenz.model;
 
-public class Usuario {
+public class Usuario implements Internacionalizable{
 	private String nombre;
     private int puntaje;
 
@@ -32,5 +32,11 @@ public class Usuario {
                 ", puntaje=" + puntaje +
                 '}';
     }
+
+	@Override
+	public void cambiarIdioma(String idioma) {
+		// TODO Auto-generated method stub
+		
+	}
 }
 

@@ -1,6 +1,8 @@
 package edu.co.konrandlorenz.control;
 
 import edu.co.konrandlorenz.model.GestorJuego;
+import edu.co.konrandlorenz.model.Jugador;
+import edu.co.konrandlorenz.model.Tablero;
 import edu.co.konrandlorenz.view.Ventana;
 
 public class Controller {
@@ -13,13 +15,26 @@ public class Controller {
 		this.ventana = ventana;
 	}
 	
-	public void manejarEntrada() {
-		
-	}
-	
-	public void actualizarVista() {
+    public void manejarEntrada(int columna) {
+        gestorJuego.realizarMovimiento(columna);
+        actualizarVista();
+    }
 
-	}
+    public void actualizarVista() {
+        Tablero tablero = gestorJuego.getTablero();
+        ventana.actualizarTablero(tablero);
+        if (gestorJuego.haTerminado()) {
+            mostrarResultado();
+        }
+    }
+    private void mostrarResultado() {
+        Jugador ganador = gestorJuego.getGanador();
+        if (ganador != null) {
+            ventana.mostrarMensaje("¡El ganador es: " + ganador.getNombre() + "!");
+        } else {
+            ventana.mostrarMensaje("¡Empate!");
+        }
+    }
 
 	
 	public GestorJuego getGestorJuego() {
