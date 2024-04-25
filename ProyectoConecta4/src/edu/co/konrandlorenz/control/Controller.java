@@ -15,10 +15,16 @@ public class Controller {
 		this.ventana = ventana;
 	}
 	
-    public void manejarEntrada(int columna) {
-        gestorJuego.realizarMovimiento(columna);
-        actualizarVista();
-    }
+	public void manejarEntrada(int columna) {
+	    if (gestorJuego.realizarMovimiento(columna)) {
+	        actualizarVista();
+	        if (gestorJuego.haTerminado()) {
+	            mostrarResultado();
+	        }
+	    } else {
+	        ventana.mostrarMensaje("¡Movimiento inválido! Por favor, selecciona otra columna.");
+	    }
+	}
 
     public void actualizarVista() {
         Tablero tablero = gestorJuego.getTablero();
@@ -28,13 +34,14 @@ public class Controller {
         }
     }
     private void mostrarResultado() {
-        Jugador ganador = gestorJuego.getGanador();
-        if (ganador != null) {
-            ventana.mostrarMensaje("¡El ganador es: " + ganador.getNombre() + "!");
-        } else {
-            ventana.mostrarMensaje("¡Empate!");
-        }
-    }
+    	    Jugador ganador = gestorJuego.getGanador();
+    	    if (ganador != null) {
+    	        ventana.mostrarMensaje("¡El ganador es: " + ganador.getNombre() + "!");
+    	    } else if (gestorJuego.haTerminado()) {
+    	        ventana.mostrarMensaje("¡Empate!");
+    	    }
+    	}
+    
 
 	
 	public GestorJuego getGestorJuego() {

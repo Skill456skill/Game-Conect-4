@@ -100,6 +100,24 @@ public class Tablero {
         return true;
     }
     
+    public boolean hayEmpate() {
+        for (int j = 0; j < columnas; j++) {
+            if (!columnaLlena(j)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean columnaLlena(int columna) {
+        for (int i = 0; i < filas; i++) {
+            if (cuadricula[i][columna] == VACIO) {
+                return false;
+            }
+        }
+        return true;
+    }
+    
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -158,6 +176,8 @@ public class Tablero {
 	public void setCuadricula(char[][] cuadricula) {
 		this.cuadricula = cuadricula;
 	}
+
+	
 
 
 
