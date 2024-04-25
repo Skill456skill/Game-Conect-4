@@ -145,7 +145,7 @@ public class GestorJuego implements Juego {
 	}
 
 	@Override
-	public String toString() {
+	public String toString() {                    
 		return "GestorJuego [jugadorActual=" + jugadorActual + ", jugadorOponente=" + jugadorOponente + ", tablero="
 				+ tablero + ", rankingGlobal=" + rankingGlobal + ", scanner=" + scanner + "]";
 	}
